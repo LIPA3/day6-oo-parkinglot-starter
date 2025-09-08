@@ -19,20 +19,24 @@ public class ParkingLot {
 
     public Ticket park(Car car) {
         return IntStream.rangeClosed(1, capacity).boxed()
-                .filter(position -> ticketCars.keySet().stream().noneMatch(ticket -> ticket.position() == position))
+                .filter(position -> ticketCars.keySet().stream().noneMatch(ticket -> ticket.getPosition().equals(position)))
                 .findFirst()
                 .map(position -> {
                     Ticket ticket = new Ticket(car, position, this);
                     ticketCars.put(ticket, car);
                     return ticket;
                 })
-                .orElseThrow(() -> new IllegalStateException("no available position."));
+                .orElseGet(() -> {
+                    System.out.println("No available position.");
+                    return null;
+                });
     }
 
-    public Car fetch(Ticket ticketResult) {
-        if(ticketResult == null || !ticketCars.containsKey(ticketResult)) {
-            throw new IllegalArgumentException("Unrecognized parking ticket.");
+    public Car fetch(Ticket ticket) {
+        if (!ticketCars.containsKey(ticket)) {
+            System.out.println("Unrecognized parking ticket");
+            return null;
         }
-        return ticketCars.remove(ticketResult);
+        return ticketCars.remove(ticket);
     }
 }
