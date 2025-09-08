@@ -3,7 +3,7 @@ package com.afs.parkinglot;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParkingLotTest {
     @Test
@@ -73,5 +73,43 @@ public class ParkingLotTest {
         Ticket ticketResult = parkingLot.park(car2);
 
         assertEquals(null, ticketResult);
+    }
+
+    @Test
+    public void should_given_parking_lot_and_unrecognized_ticket_return_error_message_when_fetch_the_car(){
+        ParkingLot parkingLot = new ParkingLot();
+        Car car = new Car("park num 1");
+        parkingLot.park(car);
+        Ticket wrongTicket = null;
+
+        Car fetchedCar = parkingLot.fetch(wrongTicket);
+
+        assertEquals(null, fetchedCar);
+    }
+    @Test
+    public void should_given_parking_lot_and_used_ticket_return_error_message_when_fetch_the_car(){
+        ParkingLot parkingLot = new ParkingLot();
+        Car car = new Car("park num 1");
+        Ticket ticket = parkingLot.park(car);
+        parkingLot.fetch(ticket);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> parkingLot.fetch(ticket)
+        );
+
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+    @Test
+    public void should_given_no_position_parking_lot_return_error_message_when_park_the_car(){
+        ParkingLot parkingLot =new ParkingLot(1);
+        Car car1 = new Car("park num 1");
+        Car car2 = new Car("park num 2");
+        parkingLot.park(car1);
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> parkingLot.park(car2)
+        );
+        assertEquals("no available position.", exception.getMessage());
     }
 }

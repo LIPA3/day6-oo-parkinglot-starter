@@ -26,10 +26,13 @@ public class ParkingLot {
                     ticketCars.put(ticket, car);
                     return ticket;
                 })
-                .orElse(null);
+                .orElseThrow(() -> new IllegalStateException("no available position."));
     }
 
     public Car fetch(Ticket ticketResult) {
+        if(ticketResult == null || !ticketCars.containsKey(ticketResult)) {
+            throw new IllegalArgumentException("Unrecognized parking ticket.");
+        }
         return ticketCars.remove(ticketResult);
     }
 }
